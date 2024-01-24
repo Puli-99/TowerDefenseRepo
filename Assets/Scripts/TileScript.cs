@@ -12,16 +12,19 @@ public class TileScript : MonoBehaviour
 {
     [SerializeField] Color defaultC = Color.red;
     [SerializeField] Color placedC = Color.black;
+    [SerializeField] Color exploredC = Color.yellow;
+    [SerializeField] Color pathC = Color.blue;
+
 
     TextMeshPro label;
     Vector2Int coordinates = new Vector2Int();
-    Waypoint waypoint;
+    GridManager gridManager;
 
     void Awake()
     {
+        gridManager = FindObjectOfType<GridManager>();
         label = GetComponent<TextMeshPro>();
         label.enabled = true;
-        waypoint = GetComponentInParent<Waypoint>();
         DisplayCoordinates();
     }
 
@@ -38,13 +41,27 @@ public class TileScript : MonoBehaviour
 
     void SetLabelColor()
     {
-        if (waypoint.IsPlaceable)
+        if(gridManager == null) { return; }
+                
+        Node node = gridManager.GetNode(coordinates);
+
+        if (node == null) { return; }
+      
+        if (!node.isWalkable)
         {
-           label.color = defaultC;
+            label.color = placedC;
+        }
+        else if (!node.isPath)
+        {
+            label.color = pathC;
+        }
+        else if (!node.isExplored)
+        {
+            label.color = exploredC;
         }
         else
         {
-            label.color = placedC;
+            label.color = defaultC;
         }
     }
 
